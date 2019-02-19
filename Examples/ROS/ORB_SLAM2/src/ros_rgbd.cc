@@ -29,12 +29,16 @@
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
+#include <geometry_msgs/PoseStamped.h>
 
 #include<opencv2/core/core.hpp>
 
 #include"../../../include/System.h"
 
 using namespace std;
+
+cv::Mat M;
+ros::Publisher pub;
 
 class ImageGrabber
 {
@@ -65,12 +69,14 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
+    //pub = nh.advertise<std_msgs::String>("/topic",1);
+
     message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/camera/color/image_raw", 1);
     message_filters::Subscriber<sensor_msgs::Image> depth_sub(nh, "/camera/depth/image_raw", 1);
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> sync_pol;
     message_filters::Synchronizer<sync_pol> sync(sync_pol(10), rgb_sub,depth_sub);
     sync.registerCallback(boost::bind(&ImageGrabber::GrabRGBD,&igb,_1,_2));
-
+    
     ros::spin();
 
     // Stop all threads
@@ -124,7 +130,7 @@ d_channels<<" type: "<< d_type <<"  rgb: "<<rgb_h<<" by "<<rgb_w<<", channels: "
 rgb_channels<<" type: "<<cv_32f<<std::endl;
 */
 
-    cv::Mat M;
+    //cv::Mat M;
 //#ifdef COMPILEDWITHC11
         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 //#else
@@ -140,5 +146,15 @@ rgb_channels<<" type: "<<cv_32f<<std::endl;
     double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
     //cout << "Time consumed : " << ttrack * 1e3 << "ms" <<endl;
     //cout << "Camera Pose : "<< endl << M <<endl;
+    
+    //pub.publish(msg);
 
+//##########  M type: CV_32F
+    
+    std::cout<<M.rows<<" by "<<M.cols<<" type: "<<M.type()<<std::endl<<"----------"<<std::endl;
+    std::cout<<M<<std::endl;
+
+    geometry_msgs::PoseStamped CameraPose;
+    CameraPose.header.stamp = cv_ptrRGB->header.stamp;
+    //CameraPose.pose.position.x = M.at<>
 }

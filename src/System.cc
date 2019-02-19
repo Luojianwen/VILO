@@ -197,10 +197,11 @@ cv::Mat System::TrackRGBD(const cv::Mat &im, const cv::Mat &depthmap, const doub
             mbDeactivateLocalizationMode = false;
         }
     }
-    //mpTracker->InformOnlyTracking(true);
-std::cout<<"mbActivateLocalizationMode: "<<mbActivateLocalizationMode<<std::endl;
-std::cout<<"mbDeactivateLocalizationMode: "<<mbDeactivateLocalizationMode<<std::endl;
-std::cout<<"mbOnlyTracking: "<<mpTracker->mbOnlyTracking<<std::endl;
+
+//std::cout<<"mbActivateLocalizationMode: "<<mbActivateLocalizationMode<<std::endl;
+//std::cout<<"mbDeactivateLocalizationMode: "<<mbDeactivateLocalizationMode<<std::endl;
+//std::cout<<"mbOnlyTracking: "<<mpTracker->mbOnlyTracking<<std::endl;
+
     // Check reset
     {
     unique_lock<mutex> lock(mMutexReset);
