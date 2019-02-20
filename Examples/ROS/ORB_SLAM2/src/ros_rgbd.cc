@@ -30,9 +30,14 @@
 #include <message_filters/time_synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 
+#include "std_msgs/String.h"
+#include "std_msgs/Float64.h"
+
 #include<opencv2/core/core.hpp>
 
 #include"../../../include/System.h"
+
+
 
 using namespace std;
 
@@ -44,6 +49,7 @@ public:
     void GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const sensor_msgs::ImageConstPtr& msgD);
 
     ORB_SLAM2::System* mpSLAM;
+    float a ; // <hold data to be published>
 };
 
 int main(int argc, char **argv)
@@ -64,15 +70,25 @@ int main(int argc, char **argv)
     ImageGrabber igb(&SLAM);
 
     ros::NodeHandle nh;
+     
 
     message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/camera/color/image_raw", 1);
     message_filters::Subscriber<sensor_msgs::Image> depth_sub(nh, "/camera/depth/image_raw", 1);
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> sync_pol;
     message_filters::Synchronizer<sync_pol> sync(sync_pol(10), rgb_sub,depth_sub);
+
     sync.registerCallback(boost::bind(&ImageGrabber::GrabRGBD,&igb,_1,_2));
-
-    ros::spin();
-
+    // set up publisher
+    std_msgs::Float64 msg;
+    ros::Publisher chatter_pub = nh.advertise<std_msgs::Float64>("chatter", 1);
+    
+    //ros::spin();
+    while (ros::ok()){
+        msg.data =  igb.a ;
+        chatter_pub.publish(msg);
+        ros::spinOnce();
+    }
+    
     // Stop all threads
     SLAM.Shutdown();
 
@@ -139,6 +155,8 @@ rgb_channels<<" type: "<<cv_32f<<std::endl;
 
     double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
     //cout << "Time consumed : " << ttrack * 1e3 << "ms" <<endl;
-    //cout << "Camera Pose : "<< endl << M <<endl;
+    float m = M.at<float>(0,0) ;
+    a = m ; // first element
+    cout << "Camera Pose : "<< endl << m <<endl << a <<endl;
 
 }
