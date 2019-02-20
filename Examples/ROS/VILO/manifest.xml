@@ -1,10 +1,10 @@
 <package>
-  <description brief="ORB_SLAM2">
+  <description brief="VILO">
 
-     ORB_SLAM2
+     VILO
 
   </description>
-  <author>Raul Mur-Artal</author>
+  <author>Jianwen-Luo</author>
   <license>GPLv3</license>
   <depend package="roscpp"/>
   <depend package="tf"/>

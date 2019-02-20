@@ -29,7 +29,9 @@
 #include <message_filters/subscriber.h>
 #include <message_filters/time_synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
+#include <std_msgs/String.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <sensor_msgs/Imu.h>
 
 #include<opencv2/core/core.hpp>
 
@@ -39,6 +41,7 @@ using namespace std;
 
 cv::Mat M;
 ros::Publisher pub;
+ros::Subscriber sub;
 
 class ImageGrabber
 {
@@ -46,9 +49,14 @@ public:
     ImageGrabber(ORB_SLAM2::System* pSLAM):mpSLAM(pSLAM){}
 
     void GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const sensor_msgs::ImageConstPtr& msgD);
-
     ORB_SLAM2::System* mpSLAM;
 };
+
+void VIO(const std_msgs::String::ConstPtr& msg)
+{
+    ROS_INFO_STREAM("Writing imu data" <<msg->data); 
+    std::cout<<"VIO is called ..."<<std::endl;
+}
 
 int main(int argc, char **argv)
 {
@@ -69,19 +77,20 @@ int main(int argc, char **argv)
 
     ros::NodeHandle nh;
 
-    //pub = nh.advertise<std_msgs::String>("/topic",1);
-
     message_filters::Subscriber<sensor_msgs::Image> rgb_sub(nh, "/camera/color/image_raw", 1);
     message_filters::Subscriber<sensor_msgs::Image> depth_sub(nh, "/camera/depth/image_raw", 1);
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> sync_pol;
     message_filters::Synchronizer<sync_pol> sync(sync_pol(10), rgb_sub,depth_sub);
     sync.registerCallback(boost::bind(&ImageGrabber::GrabRGBD,&igb,_1,_2));
     
+    sub = nh.subscribe("/camera/imu/data_raw", 10, VIO);
+
     ros::spin();
 
+    std::cout<<"Starting shutdown ..."<<std::endl;
     // Stop all threads
     SLAM.Shutdown();
-
+    std::cout<<"Saving trajectory ..."<<std::endl;
     // Save camera trajectory
     SLAM.SaveKeyFrameTrajectoryTUM("KeyFrameTrajectory.txt");
 
@@ -132,18 +141,18 @@ rgb_channels<<" type: "<<cv_32f<<std::endl;
 
     //cv::Mat M;
 //#ifdef COMPILEDWITHC11
-        std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
+        //std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
 //#else
 //        std::chrono::monotonic_clock::time_point t1 = std::chrono::monotonic_clock::now();
 //#endif
     M = mpSLAM->TrackRGBD(cv_ptrRGB->image,cv_ptrD->image,cv_ptrRGB->header.stamp.toSec());
 //#ifdef COMPILEDWITHC11
-        std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
+        //std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 //#else
 //        std::chrono::monotonic_clock::time_point t2 = std::chrono::monotonic_clock::now();
 //#endif
 
-    double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
+    //double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
     //cout << "Time consumed : " << ttrack * 1e3 << "ms" <<endl;
     //cout << "Camera Pose : "<< endl << M <<endl;
     
@@ -151,8 +160,8 @@ rgb_channels<<" type: "<<cv_32f<<std::endl;
 
 //##########  M type: CV_32F
     
-    std::cout<<M.rows<<" by "<<M.cols<<" type: "<<M.type()<<std::endl<<"----------"<<std::endl;
-    std::cout<<M<<std::endl;
+    //std::cout<<M.rows<<" by "<<M.cols<<" type: "<<M.type()<<std::endl<<"----------"<<std::endl;
+    //std::cout<<M<<std::endl;
 
     geometry_msgs::PoseStamped CameraPose;
     CameraPose.header.stamp = cv_ptrRGB->header.stamp;

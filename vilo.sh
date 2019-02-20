@@ -1,4 +1,4 @@
-file="/home/jianwen/ORB_SLAM2/KeyFrameTrajectory.txt"
+file="/home/jianwen/VILO/KeyFrameTrajectory.txt"
 
 if [ ! -f $file ]; then
 	echo "File dose not exist"
@@ -7,7 +7,7 @@ else
 	rm $file
 fi
 
-file="/home/jianwen/ORB_SLAM2/CameraTrajectory.txt"
+file="/home/jianwen/VILO/CameraTrajectory.txt"
 
 if [ ! -f $file ]; then
 	echo "File dose not exist"
@@ -16,4 +16,4 @@ else
 	rm $file
 fi
 
-rosrun ORB_SLAM2 RGBD /home/euclid/ORB_SLAM2/Vocabulary/ORBvoc.txt /home/euclid/ORB_SLAM2/Examples/ROS/ORB_SLAM2/rgbd_euclid.yaml
+rosrun VILO RGBD /home/euclid/VILO/Vocabulary/ORBvoc.txt /home/euclid/VILO/Examples/ROS/VILO/rgbd_euclid.yaml
