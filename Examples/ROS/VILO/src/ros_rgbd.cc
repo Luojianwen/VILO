@@ -40,8 +40,10 @@
 using namespace std;
 
 cv::Mat M;
-ros::Publisher pub;
-ros::Subscriber sub;
+geometry_msgs::PoseStamped CameraPose;
+//ros::Publisher pub;
+//ros::Subscriber sub;
+//int cnt(0);
 
 class ImageGrabber
 {
@@ -51,13 +53,14 @@ public:
     void GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const sensor_msgs::ImageConstPtr& msgD);
     ORB_SLAM2::System* mpSLAM;
 };
-
-void VIO(const std_msgs::String::ConstPtr& msg)
+/*
+void VIO(const sensor_msgs::Imu& msg)
 {
-    ROS_INFO_STREAM("Writing imu data" <<msg->data); 
-    std::cout<<"VIO is called ..."<<std::endl;
+    //ROS_INFO_STREAM("Writing imu data" <<msg->data); 
+    std::cout<<"VIO is called ..."<<cnt<<std::endl;
+    cnt ++;
 }
-
+*/
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "RGBD");
@@ -83,7 +86,7 @@ int main(int argc, char **argv)
     message_filters::Synchronizer<sync_pol> sync(sync_pol(10), rgb_sub,depth_sub);
     sync.registerCallback(boost::bind(&ImageGrabber::GrabRGBD,&igb,_1,_2));
     
-    sub = nh.subscribe("/camera/imu/data_raw", 10, VIO);
+    //sub = nh.subscribe("/camera/imu/data_raw", 10, VIO);
 
     ros::spin();
 
@@ -162,8 +165,13 @@ rgb_channels<<" type: "<<cv_32f<<std::endl;
     
     //std::cout<<M.rows<<" by "<<M.cols<<" type: "<<M.type()<<std::endl<<"----------"<<std::endl;
     //std::cout<<M<<std::endl;
-
-    geometry_msgs::PoseStamped CameraPose;
+    
     CameraPose.header.stamp = cv_ptrRGB->header.stamp;
-    //CameraPose.pose.position.x = M.at<>
+    CameraPose.pose.position.x = M.at<float>(0,3);
+    CameraPose.pose.position.y = M.at<float>(1,3);
+    CameraPose.pose.position.z = M.at<float>(2,3);
+    //double x = M.at<float>(0,3);
+    std::cout<<"x--->"<<CameraPose.pose.position.x<<std::endl;
+    std::cout<<"y--->"<<CameraPose.pose.position.y<<std::endl;
+    std::cout<<"z--->"<<CameraPose.pose.position.z<<std::endl;
 }
