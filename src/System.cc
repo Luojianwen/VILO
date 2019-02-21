@@ -37,12 +37,16 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 {
     // Output welcome message
     cout << endl <<
-    "VILO Copyright (C) 2019 Jianwen Luo, Southern University of Science and Technology." << endl <<
-    "This program comes with ABSOLUTELY NO WARRANTY;" << endl  <<
-    "This is free software, and you are welcome to redistribute it" << endl <<
-    "under certain conditions. See LICENSE.txt." << endl << endl;
+    "# =============================================== #" << endl <<
+    "# VILO Copyright (C) 2019 Jianwen Luo             #" << endl <<
+    "# Southern University of Science and Technology.  #" << endl <<
+    "# This program comes with ABSOLUTELY NO WARRANTY. #" << endl <<
+    "# This is free software, and you are welcome to   #" << endl <<
+    "# redistribute it under certain conditions. See   #" << endl <<
+    "# LICENSE.txt.                                    #" << endl <<
+    "# =============================================== #" << endl << endl;
 
-    cout << "Input sensor was set to: ";
+    cout << "Sensor type: ";
 
     if(mSensor==MONOCULAR)
         cout << "Monocular" << endl;
@@ -61,7 +65,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
 
 
     //Load ORB Vocabulary
-    cout << endl << "Loading ORB Vocabulary. This could take a while..." << endl;
+    cout << "Loading ORB Vocabulary. Please wait..." << endl;
 
     mpVocabulary = new ORBVocabulary();
     bool bVocLoad = mpVocabulary->loadFromTextFile(strVocFile);
@@ -71,7 +75,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const eS
         cerr << "Falied to open at: " << strVocFile << endl;
         exit(-1);
     }
-    cout << "Vocabulary loaded!" << endl << endl;
+    cout << "Vocabulary loaded !" << endl << endl;
 
     //Create KeyFrame Database
     mpKeyFrameDatabase = new KeyFrameDatabase(*mpVocabulary);

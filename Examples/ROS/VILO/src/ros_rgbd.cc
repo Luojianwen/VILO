@@ -75,7 +75,7 @@ int main(int argc, char **argv)
     message_filters::Synchronizer<sync_pol> sync(sync_pol(10), rgb_sub,depth_sub);
     sync.registerCallback(boost::bind(&ImageGrabber::GrabRGBD,&igb,_1,_2));
      
-    igb.pub = nh.advertise<geometry_msgs::PoseStamped>("vilo", 2);
+    igb.pub = nh.advertise<geometry_msgs::PoseStamped>("vo", 2);
     //igb.cnt = 0;
 
     ros::spin();
@@ -147,11 +147,12 @@ rgb_channels<<" type: "<<cv_32f<<std::endl;
 
     //double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
     //cout << "Time consumed : " << ttrack * 1e3 << "ms" <<endl;
-    
-    geometry_msgs::PoseStamped CameraPose;
+    if(!M.empty())
+    {
+        geometry_msgs::PoseStamped CameraPose;
     CameraPose.header.stamp = cv_ptrRGB->header.stamp;
     CameraPose.header.seq = cv_ptrRGB->header.seq;
-    CameraPose.header.frame_id = "vilo_IMU_data";
+    CameraPose.header.frame_id = "vo_frame";
     CameraPose.pose.position.x = M.at<float>(0,3);
     CameraPose.pose.position.y = M.at<float>(1,3);
     CameraPose.pose.position.z = M.at<float>(2,3);
@@ -160,7 +161,14 @@ rgb_channels<<" type: "<<cv_32f<<std::endl;
     CameraPose.pose.orientation.z = 0;
     CameraPose.pose.orientation.w = 10;
     
-    std::cout<<"stamp seq:  "<<cv_ptrRGB->header.seq<<std::endl<<"time: "<<cv_ptrRGB->header.stamp.sec<<std::endl;
+    std::cout<<"stamp seq:  "<<cv_ptrRGB->header.seq<<std::endl;
+    std::cout<<"time: "<<cv_ptrRGB->header.stamp.sec<<std::endl;
+    pub.publish(CameraPose);
+    }
+    else{
+        std::cout<<"Tracking failed ... "<<std::endl;
+    }
+
 /*
     std::cout<<"z--->"<<CameraPose.pose.position.z<<std::endl;
     pub.publish(CameraPose);
@@ -170,5 +178,4 @@ rgb_channels<<" type: "<<cv_32f<<std::endl;
     ss<<"Hi James"<<cnt;
     msg.data = ss.str();
 */
-    pub.publish(CameraPose);
 }
