@@ -39,12 +39,6 @@
 
 using namespace std;
 
-//cv::Mat M;
-//geometry_msgs::PoseStamped CameraPose;
-//ros::Publisher pub;
-//ros::Subscriber sub;
-//int cnt(0);
-
 class ImageGrabber
 {
 public:
@@ -53,16 +47,9 @@ public:
     void GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const sensor_msgs::ImageConstPtr& msgD);
     ORB_SLAM2::System* mpSLAM;
     ros::Publisher pub;
-    int cnt;
+    int cnt; // in case we need to show count number, for debug use.
 };
-/*
-void VIO(const sensor_msgs::Imu& msg)
-{
-    //ROS_INFO_STREAM("Writing imu data" <<msg->data); 
-    std::cout<<"VIO is called ..."<<cnt<<std::endl;
-    cnt ++;
-}
-*/
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "RGBD");
@@ -164,13 +151,6 @@ rgb_channels<<" type: "<<cv_32f<<std::endl;
     //cout << "Time consumed : " << ttrack * 1e3 << "ms" <<endl;
     //cout << "Camera Pose : "<< endl << M <<endl;
     
-    //pub.publish(msg);
-
-//##########  M type: CV_32F
-    
-    //std::cout<<M.rows<<" by "<<M.cols<<" type: "<<M.type()<<std::endl<<"----------"<<std::endl;
-    //std::cout<<M<<std::endl;
-    
     geometry_msgs::PoseStamped CameraPose;
     CameraPose.header.stamp = cv_ptrRGB->header.stamp;
     CameraPose.header.seq = cv_ptrRGB->header.seq;
@@ -183,7 +163,7 @@ rgb_channels<<" type: "<<cv_32f<<std::endl;
     CameraPose.pose.orientation.z = 0;
     CameraPose.pose.orientation.w = 10;
     
-    std::cout<<"stamp seq: "<<cv_ptrRGB->header.seq<<std::endl<<"time: "<<cv_ptrRGB->header.stamp.nsec<<std::endl;
+    std::cout<<"stamp seq: "<<cv_ptrRGB->header.seq<<std::endl<<"time: "<<cv_ptrRGB->header.stamp.sec<<std::endl;
 /*
     std::cout<<"z--->"<<CameraPose.pose.position.z<<std::endl;
     pub.publish(CameraPose);
