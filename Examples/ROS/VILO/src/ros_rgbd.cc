@@ -47,7 +47,7 @@ public:
     void GrabRGBD(const sensor_msgs::ImageConstPtr& msgRGB,const sensor_msgs::ImageConstPtr& msgD);
     ORB_SLAM2::System* mpSLAM;
     ros::Publisher pub;
-    int cnt; // in case we need to show count number, for debug use.
+    //int cnt; // in case we need to show count number, for debug use.
 };
 
 int main(int argc, char **argv)
@@ -74,11 +74,9 @@ int main(int argc, char **argv)
     typedef message_filters::sync_policies::ApproximateTime<sensor_msgs::Image, sensor_msgs::Image> sync_pol;
     message_filters::Synchronizer<sync_pol> sync(sync_pol(10), rgb_sub,depth_sub);
     sync.registerCallback(boost::bind(&ImageGrabber::GrabRGBD,&igb,_1,_2));
-    
-    //sub = nh.subscribe("/camera/imu/data_raw", 10, VIO);
-    //pub = nh.advertise<geometry_msgs::PoseStamped>("vilo_data", 20); 
+     
     igb.pub = nh.advertise<geometry_msgs::PoseStamped>("vilo", 2);
-    igb.cnt = 0;
+    //igb.cnt = 0;
 
     ros::spin();
 
@@ -149,7 +147,6 @@ rgb_channels<<" type: "<<cv_32f<<std::endl;
 
     //double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
     //cout << "Time consumed : " << ttrack * 1e3 << "ms" <<endl;
-    //cout << "Camera Pose : "<< endl << M <<endl;
     
     geometry_msgs::PoseStamped CameraPose;
     CameraPose.header.stamp = cv_ptrRGB->header.stamp;
@@ -163,7 +160,7 @@ rgb_channels<<" type: "<<cv_32f<<std::endl;
     CameraPose.pose.orientation.z = 0;
     CameraPose.pose.orientation.w = 10;
     
-    std::cout<<"stamp seq: "<<cv_ptrRGB->header.seq<<std::endl<<"time: "<<cv_ptrRGB->header.stamp.sec<<std::endl;
+    std::cout<<"stamp seq:  "<<cv_ptrRGB->header.seq<<std::endl<<"time: "<<cv_ptrRGB->header.stamp.sec<<std::endl;
 /*
     std::cout<<"z--->"<<CameraPose.pose.position.z<<std::endl;
     pub.publish(CameraPose);
